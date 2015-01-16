@@ -37,7 +37,7 @@ cd /root/out/
 mv final.exe $RANDOM.exe
 filex=`ls -ct1 | head -1`
 sumx=`sha1sum $filex`
-echo $filex "...generated in ShellCode subfolder"
+echo $filex "...generated in out subfolder"
 echo $filex "sha1checksum is .." $sumx  
 strip --strip-debug $filex
 rm /usr/share/metasploit-framework/ShellCode/*
